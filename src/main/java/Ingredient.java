@@ -19,7 +19,7 @@ public class Ingredient {
     public Ingredient() {
     }
 
-    public Ingredient(Integer id) {
+    public Ingredient(Integer id, String testIngredient, CategoryEnum vegetable, double v, Object o) {
         this.id = id;
     }
 
