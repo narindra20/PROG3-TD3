@@ -1,18 +1,21 @@
 import java.time.Instant;
 import java.util.List;
-import java.util.Objects;
 
 public class Order {
-    private Integer id;
+
+    private int id;
     private String reference;
     private Instant creationDatetime;
     private List<DishOrder> dishOrderList;
 
-    public Integer getId() {
+    private OrderTypeEnum type;
+    private OrderStatusEnum status;
+
+    public int getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(int id) {
         this.id = id;
     }
 
@@ -40,33 +43,19 @@ public class Order {
         this.dishOrderList = dishOrderList;
     }
 
-    @Override
-    public String toString() {
-        return "Order{" +
-                "id=" + id +
-                ", reference='" + reference + '\'' +
-                ", creationDatetime=" + creationDatetime +
-                ", dishOrderList=" + dishOrderList +
-                '}';
+    public OrderTypeEnum getType() {
+        return type;
     }
 
-    Double getTotalAmountWithoutVat() {
-        throw new RuntimeException("Not implemented");
+    public void setType(OrderTypeEnum type) {
+        this.type = type;
     }
 
-    Double getTotalAmountWithVat() {
-        throw new RuntimeException("Not implemented");
+    public OrderStatusEnum getStatus() {
+        return status;
     }
 
-
-    @Override
-    public boolean equals(Object o) {
-        if (!(o instanceof Order order)) return false;
-        return Objects.equals(id, order.id) && Objects.equals(reference, order.reference) && Objects.equals(creationDatetime, order.creationDatetime) && Objects.equals(dishOrderList, order.dishOrderList);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, reference, creationDatetime, dishOrderList);
+    public void setStatus(OrderStatusEnum status) {
+        this.status = status;
     }
 }
