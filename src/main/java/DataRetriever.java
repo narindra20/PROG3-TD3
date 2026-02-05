@@ -33,6 +33,17 @@ public class DataRetriever {
     }
 
     Order saveOrder(Order order) {
+        Order existingOrder = null;
+        try {
+            existingOrder = findOrderByReference(order.getReference());
+        } catch (RuntimeException e) {
+            if (e.getMessage().contains("Order not found with reference")) {
+                System.out.println("Skip check and process save");
+            }
+        }
+        if (existingOrder != null && existingOrder.getOrderStatus().equals(OrderStatusEnum.DELIVERED)) {
+            throw new RuntimeException("Order already delivered with reference " + order.getReference());
+        }
         String upsertOrderSql = """
                     INSERT INTO "order" (id, reference, creation_datetime, order_status, order_type)
                     VALUES (?, ?, ?, ?::order_status, ?::order_type)
@@ -56,12 +67,12 @@ public class DataRetriever {
                 }
                 ps.setString(2, order.getReference());
                 ps.setTimestamp(3, Timestamp.from(order.getCreationDatetime()));
-                if(order.getOrderStatus() == null) {
+                if (order.getOrderStatus() == null) {
                     ps.setNull(4, Types.VARCHAR);
                 } else {
                     ps.setString(4, order.getOrderStatus().name());
                 }
-                if(order.getType() == null) {
+                if (order.getType() == null) {
                     ps.setNull(5, Types.VARCHAR);
                 } else {
                     ps.setString(5, order.getType().name());

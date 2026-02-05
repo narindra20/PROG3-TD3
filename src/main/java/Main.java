@@ -27,10 +27,10 @@ public class Main {
         DataRetriever dataRetriever = new DataRetriever();
         Order orderOne = dataRetriever.findOrderByReference("ORD101");
 
-        Order orderTwo = dataRetriever.findOrderByReference("ORD102");
-        orderTwo.setOrderStatus(OrderStatusEnum.CREATED);
-        orderTwo.setType(OrderType.EAT_IN);
-        Order savedOrder = dataRetriever.saveOrder(orderTwo);
+        Order orderFour = dataRetriever.findOrderByReference("ORD104");
+        orderFour.setOrderStatus(OrderStatusEnum.DELIVERED);
+        orderFour.setType(OrderType.EAT_IN);
+        Order savedOrder = dataRetriever.saveOrder(orderFour);
         System.out.println(savedOrder);
     }
 }
