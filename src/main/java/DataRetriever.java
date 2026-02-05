@@ -12,7 +12,7 @@ public class DataRetriever {
         DBConnection dbConnection = new DBConnection();
         try (Connection connection = dbConnection.getConnection()) {
             PreparedStatement preparedStatement = connection.prepareStatement("""
-                    select id, reference, creation_datetime from "order" where reference like ?""");
+                    select id, reference, creation_datetime, order_status, order_type from "order" where reference like ?""");
             preparedStatement.setString(1, reference);
             ResultSet resultSet = preparedStatement.executeQuery();
             if (resultSet.next()) {
@@ -21,6 +21,8 @@ public class DataRetriever {
                 order.setId(idOrder);
                 order.setReference(resultSet.getString("reference"));
                 order.setCreationDatetime(resultSet.getTimestamp("creation_datetime").toInstant());
+                order.setOrderStatus(resultSet.getString("order_status") == null ? null : OrderStatusEnum.valueOf(resultSet.getString("order_status")));
+                order.setType(resultSet.getString("order_type") == null ? null : OrderType.valueOf(resultSet.getString("order_type")));
                 order.setDishOrderList(findDishOrderByIdOrder(idOrder));
                 return order;
             }
@@ -54,7 +56,7 @@ public class DataRetriever {
                 ps.setTimestamp(3, Timestamp.from(order.getCreationDatetime()));
                 try (ResultSet rs = ps.executeQuery()) {
                     if (rs.next()) {
-                    orderId = rs.getInt(1);
+                        orderId = rs.getInt(1);
                     } else {
                         orderId = order.getId() != null ? order.getId() : nextSerialValue;
                     }
@@ -67,25 +69,24 @@ public class DataRetriever {
             conn.commit();
             return findOrderByReference(order.getReference());
         } catch (PSQLException e) {
-            if(e.getMessage().contains("duplicate key value violates unique constraint \"order_reference_unique\"")) {
+            if (e.getMessage().contains("duplicate key value violates unique constraint \"order_reference_unique\"")) {
                 throw new RuntimeException("Order already exists with reference " + order.getReference());
             } else {
                 throw new RuntimeException(e);
             }
-        }
-        catch (SQLException e) {
+        } catch (SQLException e) {
             throw new RuntimeException(e);
         }
     }
 
     private void detachOrders(Connection conn, Integer idOrder) {
-            try (PreparedStatement ps = conn.prepareStatement(
-                    "DELETE FROM dish_order where id_order = ?")) {
-                ps.setInt(1, idOrder);
-                ps.executeUpdate();
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
-            }
+        try (PreparedStatement ps = conn.prepareStatement(
+                "DELETE FROM dish_order where id_order = ?")) {
+            ps.setInt(1, idOrder);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private void attachOrders(Connection conn, Integer orderId, List<DishOrder> dishOrders)
@@ -100,7 +101,7 @@ public class DataRetriever {
                 """;
 
         try (PreparedStatement ps = conn.prepareStatement(attachSql)) {
-        int nextSerialValue = getNextSerialValue(conn, "dish_order", "id");
+            int nextSerialValue = getNextSerialValue(conn, "dish_order", "id");
             for (DishOrder dishOrder : dishOrders) {
                 ps.setInt(1, nextSerialValue);
                 ps.setInt(2, orderId);

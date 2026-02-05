@@ -8,6 +8,25 @@ public class Order {
     private Instant creationDatetime;
     private List<DishOrder> dishOrderList;
 
+    public OrderStatusEnum getOrderStatus() {
+        return orderStatus;
+    }
+
+    public void setOrderStatus(OrderStatusEnum orderStatus) {
+        this.orderStatus = orderStatus;
+    }
+
+    public OrderType getType() {
+        return type;
+    }
+
+    public void setType(OrderType type) {
+        this.type = type;
+    }
+
+    private OrderStatusEnum orderStatus;
+    private OrderType type;
+
     public Integer getId() {
         return id;
     }
@@ -43,9 +62,11 @@ public class Order {
     @Override
     public String toString() {
         return "Order{" +
-                "id=" + id +
-                "totalAmountWithoutVat=" + getTotalAmountWithoutVat() +
-                "totalAmountWithVat=" + getTotalAmountWithVat() +
+                "id=" + id + "," +
+                "status=" + orderStatus + "," +
+                "type=" + type + "," +
+                "totalAmountWithoutVat=" + getTotalAmountWithoutVat() + "," +
+                "totalAmountWithVat=" + getTotalAmountWithVat() + "," +
                 ", reference='" + reference + '\'' +
                 ", creationDatetime=" + creationDatetime +
                 ", dishOrderList=" + dishOrderList +
