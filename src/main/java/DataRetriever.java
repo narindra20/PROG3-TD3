@@ -34,9 +34,11 @@ public class DataRetriever {
 
     Order saveOrder(Order order) {
         String upsertOrderSql = """
-                    INSERT INTO "order" (id, reference, creation_datetime)
-                    VALUES (?, ?, ?)
-                    ON CONFLICT (id) DO NOTHING
+                    INSERT INTO "order" (id, reference, creation_datetime, order_status, order_type)
+                    VALUES (?, ?, ?, ?::order_status, ?::order_type)
+                    ON CONFLICT (id) DO UPDATE
+                    SET order_status = EXCLUDED.order_status,
+                        order_type = EXCLUDED.order_type
                     RETURNING id
                 """;
 
@@ -54,6 +56,16 @@ public class DataRetriever {
                 }
                 ps.setString(2, order.getReference());
                 ps.setTimestamp(3, Timestamp.from(order.getCreationDatetime()));
+                if(order.getOrderStatus() == null) {
+                    ps.setNull(4, Types.VARCHAR);
+                } else {
+                    ps.setString(4, order.getOrderStatus().name());
+                }
+                if(order.getType() == null) {
+                    ps.setNull(5, Types.VARCHAR);
+                } else {
+                    ps.setString(5, order.getType().name());
+                }
                 try (ResultSet rs = ps.executeQuery()) {
                     if (rs.next()) {
                         orderId = rs.getInt(1);

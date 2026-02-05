@@ -26,6 +26,11 @@ public class Main {
 //        System.out.println(laitue);
         DataRetriever dataRetriever = new DataRetriever();
         Order orderOne = dataRetriever.findOrderByReference("ORD101");
-        System.out.println(orderOne);
+
+        Order orderTwo = dataRetriever.findOrderByReference("ORD102");
+        orderTwo.setOrderStatus(OrderStatusEnum.CREATED);
+        orderTwo.setType(OrderType.EAT_IN);
+        Order savedOrder = dataRetriever.saveOrder(orderTwo);
+        System.out.println(savedOrder);
     }
 }
